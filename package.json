@@ -1,0 +1,19 @@
+{
+  "name": "prote",
+  "version": "1.0.0",
+  "description": "prototype library",
+  "main": "prote.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "mocha": "^2.1.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Tim Macfarlane <timmacfarlane@gmail.com>",
+  "license": "MIT"
+}
