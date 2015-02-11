@@ -73,17 +73,14 @@ describe("prototypes", function() {
     var a = prototype.extending(Array, {
       a: "a"
     });
-    var b = a({
-      b: "b"
-    });
+    var b = a();
 
-    b.push("item");
+    b.push("item 1");
     (b instanceof a).should.equal(true);
     (b instanceof Array).should.equal(true);
     b.a.should.equal("a");
-    b.b.should.equal("b");
     b.length.should.equal(1);
-    b[0].should.equal("item");
+    b[0].should.equal("item 1");
   });
 
   it("a prototype can be extended after creation", function() {
@@ -106,6 +103,35 @@ describe("prototypes", function() {
 
   it("prototype.extending is a function", function() {
     (prototype.extending instanceof Function).should.equal(true);
+  });
+
+  it('can declare a constructor', function () {
+    var a = prototype({
+      constructor: function (value) {
+        this.a = value;
+        this.b = value;
+      }
+    });
+
+    var objectA = a('a');
+    objectA.a.should.equal('a');
+    objectA.b.should.equal('a');
+  });
+
+  it('extending prototype uses base constructor', function () {
+    var a = prototype({
+      constructor: function (value) {
+        this.value = value;
+      }
+    });
+
+    var b = prototype.extending(a, {
+      b: 'b'
+    });
+
+    var objectB = b('b');
+    objectB.value.should.equal('b');
+    objectB.b.should.equal('b');
   });
 
   it("can call its own constructor", function() {

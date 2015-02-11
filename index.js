@@ -1,33 +1,63 @@
-function prototype(p) {
-  function constructor() {}
+function copyFields(from, to) {
+  var keys = Object.keys(from);
 
+  for (var n = 0; n < keys.length; n++) {
+    var key = keys[n];
+    to[key] = from[key];
+  }
+}
+
+function ownConstructor(p) {
+  return p.constructor !== Object.prototype.constructor && p.constructor;
+}
+
+function prototype(p) {
   p = p || {};
 
-  constructor.prototype = p;
+  var ownCtor = ownConstructor(p);
 
-  function derive(derived) {
-    var o = new constructor();
+  var derive =
+    ownCtor
+      ? function own() {
+          function constructor(args) {
+            ownCtor.apply(this, args);
+          }
 
-    if (derived) {
-      var keys = Object.keys(derived);
+          constructor.prototype = p;
+          constructor.prototype.constructor = derive;
 
-      for (var n = 0; n < keys.length; n++) {
-        var key = keys[n];
-        o[key] = derived[key];
-      }
-    }
+          var o = new constructor(arguments);
+          return o;
+        }
+      : function derive(derived) {
+          function constructor() {}
+          constructor.prototype = p;
+          constructor.prototype.constructor = derive;
 
-    return o;
-  }
+          var o = new constructor();
+
+          if (derived) {
+            copyFields(derived, o);
+          }
+
+          return o;
+        }
 
   derive.prototype = p;
-  constructor.prototype.constructor = derive;
+  p.constructor.derive;
 
   return derive;
 }
 
 module.exports = prototype;
 
-module.exports.extending = function(p, obj) {
-  return prototype(prototype(p.prototype)(obj));
+module.exports.extending = function(p, extension) {
+  function constructor() {}
+  constructor.prototype = p.prototype;
+  var object = new constructor();
+  copyFields(extension, object);
+
+  var ownCtor = ownConstructor(p.prototype);
+
+  return prototype(object);
 };
